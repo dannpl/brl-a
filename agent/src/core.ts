@@ -124,16 +124,25 @@ export class PegMonitor {
   }
 }
 
-// Trading Engine
+import { AgentDEXClient, TOKENS } from "./agentdex.js";
+
+// Trading Engine with multi-venue execution
 export class TradingEngine {
   private connection: Connection;
+  private agentDex: AgentDEXClient;
+  private walletAddress: string;
+  private useAgentDex: boolean;
 
-  constructor() {
+  constructor(walletAddress?: string, useAgentDex: boolean = true) {
     this.connection = new Connection(RPC_URL, "confirmed");
+    this.agentDex = new AgentDEXClient();
+    this.walletAddress = walletAddress || "";
+    this.useAgentDex = useAgentDex;
   }
 
   /**
    * Execute market making strategy
+   * Routes through AgentDEX for optimal execution via Jupiter V6
    */
   async executeTrade(
     action: "BUY" | "SELL" | "HOLD",
@@ -147,9 +156,27 @@ export class TradingEngine {
     console.log(`[Trading] Executing ${action} for ${amount} BRL-A`);
 
     try {
-      // TODO: Integrate with Triadmarkets Protocol
-      // - Place bid/ask orders
-      // - Execute market orders
+      if (this.useAgentDex && this.walletAddress) {
+        // Route through AgentDEX for optimal execution
+        const result = await this.agentDex.defendPeg(
+          action,
+          amount,
+          this.walletAddress,
+        );
+
+        if ("signature" in result) {
+          console.log(`[Trading] AgentDEX swap executed: ${result.signature}`);
+          console.log(
+            `[Trading] Output: ${result.outputAmount} | Impact: ${result.priceImpactPct.toFixed(4)}%`,
+          );
+        } else {
+          console.log("[Trading] Unsigned tx returned for PDA signing");
+        }
+      } else {
+        // Fallback: Direct Triadmarkets integration
+        // TODO: Implement direct Triadmarkets execution
+        console.log("[Trading] Using Triadmarkets direct execution (TODO)");
+      }
 
       console.log(`[Trading] ${action} order executed successfully`);
     } catch (error) {
@@ -159,16 +186,35 @@ export class TradingEngine {
   }
 
   /**
-   * Get BRL-A price from Triadmarkets
+   * Get BRL-A price - aggregates from multiple sources
    */
   async getBrlAPrice(): Promise<number> {
     try {
-      // TODO: Fetch from Triadmarkets Protocol
-      // For now, return mock price
+      if (this.useAgentDex) {
+        // Get price via AgentDEX quote (uses Jupiter aggregated price)
+        return await this.agentDex.getBrlAPrice();
+      }
+
+      // Fallback: Fetch from Triadmarkets Protocol
+      // TODO: Implement Triadmarkets price fetch
       return 1.0;
     } catch (error) {
       console.error("[Trading] Error fetching BRL-A price:", error);
       throw error;
+    }
+  }
+
+  /**
+   * Get quote without executing (for slippage preview)
+   */
+  async getQuote(
+    action: "BUY" | "SELL",
+    amount: number,
+  ): Promise<{ outAmount: string; priceImpactPct: number }> {
+    if (action === "BUY") {
+      return await this.agentDex.getQuote(TOKENS.USDC, TOKENS.BRL_A, amount);
+    } else {
+      return await this.agentDex.getQuote(TOKENS.BRL_A, TOKENS.USDC, amount);
     }
   }
 }
