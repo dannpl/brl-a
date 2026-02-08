@@ -107,8 +107,8 @@ The agent runs autonomously every 60 seconds:
 ## 🎰 Use Cases
 
 - **TrendzBR**: Prediction market whitelabel
-- **PalpitXei**: Sports betting platform
-- **Future**: Any Brazilian gambling/betting platform
+- **PalpitXei**: Prediction market whitelabel
+- **Future**: Any Brazilian Prediction market whitelabel
 
 ## 💰 Revenue Model
 
@@ -127,7 +127,7 @@ The agent runs autonomously every 60 seconds:
 
 - **Token (Mainnet)**: `75wzVU6j9U6oZVJjQYLtiN7Z5Ah97it1UyWZN29HgE4m`
 - **Triad Protocol**: `TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss`
-- **Hackathon**: [Colosseum Agent Hackathon](https://agents.colosseum.com)
+- **Hackathon**: [Colosseum Agent Hackathon](https://colosseum.com/agent-hackathon/projects/prediction-mx-agent)
 
 ## 📝 License
 
