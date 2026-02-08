@@ -4,6 +4,11 @@ dist
 *.log
 .DS_Store
 
+# Keypairs and secrets
+*-keypair.json
+*.key
+id.json
+
 # Build artifacts
 brl-oracle/target
 brl-oracle/node_modules
