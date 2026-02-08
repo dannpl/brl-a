@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+*.log
+.DS_Store
+
+# Build artifacts
+brl-oracle/target
+brl-oracle/node_modules
+agent/node_modules
+agent/dist
+dashboard/node_modules
+dashboard/.next
+dashboard/out
